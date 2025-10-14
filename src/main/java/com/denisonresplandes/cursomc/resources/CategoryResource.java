@@ -16,8 +16,8 @@ public class CategoryResource {
 	@GetMapping
 	public ResponseEntity<List<Category>> findAll() {
 		List<Category> categories = List.of(
-				new Category(1, "Informática"), 
-				new Category(2, "Escritório"));
+				new Category("Informática"), 
+				new Category("Escritório"));
 		return ResponseEntity.ok(categories);
 	}
 }
