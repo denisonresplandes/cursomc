@@ -1,12 +1,15 @@
 package com.denisonresplandes.cursomc.domain;
 
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToMany;
 
 @Entity
 public class Category implements Serializable {
@@ -17,6 +20,13 @@ public class Category implements Serializable {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;	
 	private String name;
+	
+	@ManyToMany(mappedBy = "categories")
+	private Set<Product> products;
+	
+	{
+		this.products = new HashSet<>();
+	}
 	
 	protected Category() { }
 	
@@ -37,6 +47,35 @@ public class Category implements Serializable {
 		validateName(name);
 		this.name = name;
 	}
+	
+	public Set<Product> getProducts() {
+		return Set.copyOf(products);
+	}
+	
+	public void addProduct(Product product) {
+		Objects.requireNonNull(product);
+		if (products.add(product)) {
+			// garante a sincronização do lado inverso
+			product.getCategoriesInternal().add(this);
+		}
+	}
+	
+	public void addAllProducts(Set<Product> newProducts) {
+		Objects.requireNonNull(newProducts);
+		newProducts.forEach(this::addProduct);
+	}
+	
+	// método auxilar para o inverso do 
+	// relacionamento bidirecional
+	Set<Product> getProductsInternal() {
+		return products;
+	}
+	
+	private void validateName(String name) {
+		Objects.requireNonNull(name);
+		if (name.isBlank()) 
+			throw new IllegalArgumentException("name is blank!");
+	}
 
 	@Override
 	public int hashCode() {
@@ -55,9 +94,4 @@ public class Category implements Serializable {
 		return Objects.equals(id, other.id);
 	}
 	
-	private void validateName(String name) {
-		Objects.requireNonNull(name);
-		if (name.isBlank()) 
-			throw new IllegalArgumentException("name is blank!");
-	}
 }
