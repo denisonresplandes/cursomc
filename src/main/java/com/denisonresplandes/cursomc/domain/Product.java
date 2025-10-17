@@ -5,6 +5,8 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -24,6 +26,7 @@ public class Product implements Serializable {
 	private String name;
 	private Double price;
 	
+	@JsonBackReference
 	@ManyToMany
 	@JoinTable(name = "product_category",
 		joinColumns = @JoinColumn(name = "id_product"),
@@ -58,6 +61,10 @@ public class Product implements Serializable {
 	public void setPrice(Double price) {
 		validatePrice(price);
 		this.price = price;
+	}
+		
+	public Set<Category> getCategories() {
+		return Set.copyOf(categories);
 	}
 		
 	public void addCategory(Category category) {

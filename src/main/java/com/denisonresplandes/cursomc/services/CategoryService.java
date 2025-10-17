@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.denisonresplandes.cursomc.domain.Category;
+import com.denisonresplandes.cursomc.exceptions.ResourceNotFoundException;
 import com.denisonresplandes.cursomc.repositories.CategoryRepository;
 
 @Service
@@ -18,7 +19,10 @@ public class CategoryService {
 	@Transactional(readOnly = true)
 	public Category findById(Integer id) {
 		validateId(id);
-		return repository.findById(id).orElse(null);
+		Category category = repository.findById(id)
+			.orElseThrow(() -> new ResourceNotFoundException(String.format("%s Id: %d, Type: %s", 
+					"Resource not found!", id, Category.class.getSimpleName())));
+		return category;
 	}
 	
 	private void validateId(Integer id) {

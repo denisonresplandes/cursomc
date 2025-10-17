@@ -5,6 +5,8 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -21,6 +23,7 @@ public class Category implements Serializable {
 	private Integer id;	
 	private String name;
 	
+	@JsonManagedReference
 	@ManyToMany(mappedBy = "categories")
 	private Set<Product> products;
 	
@@ -52,6 +55,8 @@ public class Category implements Serializable {
 		return Set.copyOf(products);
 	}
 	
+	/* estes métodos de addProduct podem ser removidos
+	 * devido a esta classe não ser a dona da relaçao. */
 	public void addProduct(Product product) {
 		Objects.requireNonNull(product);
 		if (products.add(product)) {
