@@ -5,7 +5,7 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -26,7 +26,7 @@ public class Product implements Serializable {
 	private String name;
 	private Double price;
 	
-	@JsonBackReference
+	@JsonIgnore
 	@ManyToMany
 	@JoinTable(name = "product_category",
 		joinColumns = @JoinColumn(name = "id_product"),
@@ -66,30 +66,47 @@ public class Product implements Serializable {
 	public Set<Category> getCategories() {
 		return Set.copyOf(categories);
 	}
-		
+	
+	public void removeCategory(Category category) {
+	    Objects.requireNonNull(category);
+	    if (categories.remove(category)) {
+	    	// sincronização
+	        category.removeProductInternal(this);
+	    }
+	}
+	
+	public void removeCategories(Set<Category> oldCategories) {
+		Objects.requireNonNull(oldCategories);
+		oldCategories.forEach(this::removeCategory);
+	}
+	
 	public void addCategory(Category category) {
 		Objects.requireNonNull(category);
 		if (categories.add(category)) {
 			// garante a sincronização do lado inverso
-			category.getProductsInternal().add(this);
+			category.addProductInternal(this);
 		}
 	}
 	
-	public void addAllCategories(Set<Category> newCategories) {
+	public void addCategories(Set<Category> newCategories) {
 		Objects.requireNonNull(newCategories);
 		newCategories.forEach(this::addCategory);
 	}
 	
 	// método auxilar para o inverso do 
 	// relacionamento bidirecional
-	Set<Category> getCategoriesInternal() {
-		return categories;
+	void addCategoryInternal(Category category) {
+		categories.add(category);
+	}
+	
+	void removeCategoryInternal(Category category) {
+		categories.remove(category);
 	}
 	
 	private void validateName(String name) {
 		Objects.requireNonNull(name);
 		if (name.isBlank()) { 
-			throw new IllegalArgumentException("id is blank");
+			throw new IllegalArgumentException("name is blank");
 		}
 	}
 	

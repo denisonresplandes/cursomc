@@ -5,8 +5,6 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -23,7 +21,6 @@ public class Category implements Serializable {
 	private Integer id;	
 	private String name;
 	
-	@JsonManagedReference
 	@ManyToMany(mappedBy = "categories")
 	private Set<Product> products;
 	
@@ -55,25 +52,34 @@ public class Category implements Serializable {
 		return Set.copyOf(products);
 	}
 	
-	/* estes métodos de addProduct podem ser removidos
-	 * devido a esta classe não ser a dona da relaçao. */
+	public void removeProduct(Product product) {
+		Objects.requireNonNull(product);
+		if (products.remove(product)) {
+			product.removeCategoryInternal(this);
+		}
+	}
+	
 	public void addProduct(Product product) {
 		Objects.requireNonNull(product);
 		if (products.add(product)) {
 			// garante a sincronização do lado inverso
-			product.getCategoriesInternal().add(this);
+			product.addCategoryInternal(this);
 		}
 	}
 	
-	public void addAllProducts(Set<Product> newProducts) {
+	public void addProducts(Set<Product> newProducts) {
 		Objects.requireNonNull(newProducts);
 		newProducts.forEach(this::addProduct);
 	}
 	
 	// método auxilar para o inverso do 
 	// relacionamento bidirecional
-	Set<Product> getProductsInternal() {
-		return products;
+	void addProductInternal(Product product) {
+		products.add(product);
+	}
+	
+	void removeProductInternal(Product product) {
+		products.remove(product);
 	}
 	
 	private void validateName(String name) {
