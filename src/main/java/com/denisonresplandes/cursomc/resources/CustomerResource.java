@@ -9,23 +9,23 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.denisonresplandes.cursomc.domain.Category;
-import com.denisonresplandes.cursomc.services.CategoryService;
+import com.denisonresplandes.cursomc.domain.Customer;
+import com.denisonresplandes.cursomc.services.CustomerService;
 
 @RestController
-@RequestMapping("/categorias")
-public class CategoryResource {
+@RequestMapping("/clientes")
+public class CustomerResource {
 
 	@Autowired
-	private CategoryService service;
+	private CustomerService service;
 	
 	@GetMapping
-	public ResponseEntity<List<Category>> findAll() {
+	public ResponseEntity<List<Customer>> findAll() {
 		return ResponseEntity.ok(service.findAll());
 	}
 	
 	@GetMapping("/{id}")
-	public ResponseEntity<Category> findById(@PathVariable Integer id) {
+	public ResponseEntity<Customer> findById(@PathVariable Integer id) {
 		return ResponseEntity.ok(service.findById(id));
 	}
 }

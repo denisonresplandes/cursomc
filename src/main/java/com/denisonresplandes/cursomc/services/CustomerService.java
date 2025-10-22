@@ -7,28 +7,28 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.denisonresplandes.cursomc.domain.Category;
+import com.denisonresplandes.cursomc.domain.Customer;
 import com.denisonresplandes.cursomc.exceptions.ResourceNotFoundException;
-import com.denisonresplandes.cursomc.repositories.CategoryRepository;
+import com.denisonresplandes.cursomc.repositories.CustomerRepository;
 
 @Service
-public class CategoryService {
+public class CustomerService {
 
 	@Autowired
-	private CategoryRepository repository;
+	private CustomerRepository repository;
 	
 	@Transactional(readOnly = true)
-	public List<Category> findAll() {
+	public List<Customer> findAll() {
 		return repository.findAll();
-	}	
+	}
 	
 	@Transactional(readOnly = true)
-	public Category findById(Integer id) {
+	public Customer findById(Integer id) {
 		validateId(id);
-		Category category = repository.findById(id)
+		Customer customer = repository.findById(id)
 			.orElseThrow(() -> new ResourceNotFoundException(String.format("%s Id: %d, Type: %s", 
-					"Resource not found!", id, Category.class.getSimpleName())));
-		return category;
+					"Resource not found!", id, Customer.class.getSimpleName())));
+		return customer;
 	}
 	
 	private void validateId(Integer id) {

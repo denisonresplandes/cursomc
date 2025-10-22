@@ -2,6 +2,8 @@ package com.denisonresplandes.cursomc.domain;
 
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -21,6 +23,7 @@ public class Address {
 	private String neighborhood; 	// bairro
 	private String postalCode;		// CEP
 	
+	@JsonIgnore
 	@ManyToOne
 	@JoinColumn(name = "id_customer")
 	private Customer customer;
@@ -74,7 +77,7 @@ public class Address {
 	public String getPostalCode() {
 		return postalCode;
 	}
-
+	
 	public Customer getCustomer() {
 		return customer;
 	}
