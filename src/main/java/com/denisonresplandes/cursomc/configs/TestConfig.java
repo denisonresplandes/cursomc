@@ -1,5 +1,7 @@
 package com.denisonresplandes.cursomc.configs;
 
+import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Set;
 
@@ -8,16 +10,21 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Configuration;
 
 import com.denisonresplandes.cursomc.domain.Address;
+import com.denisonresplandes.cursomc.domain.CardPayment;
 import com.denisonresplandes.cursomc.domain.Category;
 import com.denisonresplandes.cursomc.domain.City;
 import com.denisonresplandes.cursomc.domain.Customer;
+import com.denisonresplandes.cursomc.domain.Order;
+import com.denisonresplandes.cursomc.domain.PaymentBankSlip;
 import com.denisonresplandes.cursomc.domain.Product;
 import com.denisonresplandes.cursomc.domain.State;
+import com.denisonresplandes.cursomc.domain.enums.PaymentStatus;
 import com.denisonresplandes.cursomc.domain.enums.TypeCustomer;
 import com.denisonresplandes.cursomc.repositories.AddressRepository;
 import com.denisonresplandes.cursomc.repositories.CategoryRepository;
 import com.denisonresplandes.cursomc.repositories.CityRepository;
 import com.denisonresplandes.cursomc.repositories.CustomerRepository;
+import com.denisonresplandes.cursomc.repositories.OrderRepository;
 import com.denisonresplandes.cursomc.repositories.ProductRepository;
 import com.denisonresplandes.cursomc.repositories.StateRepository;
 
@@ -40,7 +47,10 @@ public class TestConfig implements CommandLineRunner {
 	private CustomerRepository customerRepository;
 	
 	@Autowired
-	private AddressRepository addressRepository;	
+	private AddressRepository addressRepository;
+	
+	@Autowired
+	private OrderRepository orderRepository;
 	
 	@Override
 	public void run(String... args) throws Exception {
@@ -77,16 +87,32 @@ public class TestConfig implements CommandLineRunner {
 		
 		Customer customer1 = new Customer("Maria Silva", "maria@gmail.com", "36378912377", 
 				TypeCustomer.NATURAL_PERSON);
+		
 		customer1.addPhones(Set.of("27363323", "93838393"));
+		
 		Address address1 = new Address("Rua Flores", "300", "Apto 203", "Jardim", 
 				"38220834", customer1, city1);
 		Address address2 = new Address("Avenida Matos", "105", "Sala 800", "Centro", 
 				"38777012", customer1, city2);
+		
 		customer1.addAddress(address1);
 		customer1.addAddress(address2);
 		
 		customerRepository.save(customer1);
 		addressRepository.saveAll(List.of(address1, address2));
+		
+		Order o1 = new Order(ZonedDateTime.parse("2025-10-23T10:32:00-03:00"), 
+				customer1, address1);
+		Order o2 = new Order(ZonedDateTime.parse("2025-10-10T19:35:00-03:00"), 
+				customer1, address2);
+		
+		o1.setPayment(new CardPayment(o1, PaymentStatus.PAID_OFF, 6));
+		o2.setPayment(new PaymentBankSlip(o2, PaymentStatus.PENDING, LocalDate
+				.parse("2025-10-20"), null));
+		
+		customer1.addOrder(o1);
+		customer1.addOrder(o2);
+		
+		orderRepository.saveAll(List.of(o1, o2));
 	}
-
 }

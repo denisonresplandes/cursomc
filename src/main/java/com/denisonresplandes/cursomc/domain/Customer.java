@@ -39,9 +39,14 @@ public class Customer implements Serializable {
 		orphanRemoval = true)
 	private Set<Address> addresses;
 	
+	@OneToMany(mappedBy = "customer", cascade = CascadeType.REMOVE,
+		orphanRemoval = true)
+	private Set<Order> orders;
+	
 	{
 		phones = new HashSet<>();
 		addresses = new HashSet<>();
+		orders = new HashSet<>();
 	}
 
 	protected Customer() {}
@@ -118,6 +123,20 @@ public class Customer implements Serializable {
 	public void addAddresses(Set<Address> newAddresses) {
 		Objects.requireNonNull(newAddresses);
 		newAddresses.forEach(this::addAddress);
+	}
+	
+	public Set<Order> getOrders() {
+		return orders;
+	}
+	
+	public void addOrder(Order order) {
+		Objects.requireNonNull(order);
+		orders.add(order);
+	}
+	
+	public void addOrders(Set<Order> orders) {
+		Objects.requireNonNull(orders);
+		orders.forEach(this::addOrder);
 	}
 		
 	private void validateAttribs(String name, String email, String cpfOrCnpj, 
