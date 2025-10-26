@@ -2,7 +2,11 @@ package com.denisonresplandes.cursomc.domain;
 
 import java.io.Serializable;
 import java.time.ZonedDateTime;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -11,6 +15,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
@@ -35,6 +40,14 @@ public class Order implements Serializable {
 	@ManyToOne
 	@JoinColumn(name = "id_delivery_address")
 	private Address deliveryAddress;
+	
+	@OneToMany(mappedBy = "id.order", cascade = CascadeType.ALL,
+			orphanRemoval = true)
+	private Set<OrderItem> orderItems;
+	
+	{
+		this.orderItems = new HashSet<>();
+	}
 	
 	protected Order() { }
 
@@ -70,7 +83,38 @@ public class Order implements Serializable {
 		Objects.requireNonNull(newAddress);
 		this.deliveryAddress = newAddress;
 	}
-
+	
+	public Set<Product> getProducts() {
+		Set<Product> products = this.orderItems.stream()
+			.map(OrderItem::getProduct)
+			.collect(Collectors.toSet());
+		// retorna uma view imutável e leve, sem cópia.
+		return Collections.unmodifiableSet(products);
+	}
+	
+	public void removeOrderItem(OrderItem oi) {
+		Objects.requireNonNull(oi);
+		if (this.orderItems.remove(oi)) {
+			oi.getProduct().removeOrderItemInternal(oi);
+		}		
+	}
+		
+	public void addOrderItem(OrderItem oi) {
+		Objects.requireNonNull(oi);
+		// camada extra de robustez
+		if (!this.equals(oi.getOrder())) {
+	        throw new IllegalStateException("OrderItem does not belong to this Order");
+	    }
+		if (this.orderItems.add(oi)) {
+			oi.getProduct().addOrderItemInternal(oi);
+		}
+	}
+	
+	public void addOrderItems(Set<OrderItem> ois) {
+		Objects.requireNonNull(ois);
+		ois.forEach(this::addOrderItem);
+	}
+		
 	private void validateAttribs(ZonedDateTime date, Customer customer, 
 			Address deliveryAddress) {
 		Objects.requireNonNull(date, "date is null");

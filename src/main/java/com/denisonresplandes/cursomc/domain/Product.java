@@ -4,16 +4,19 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
 
 @Entity
 public class Product implements Serializable {
@@ -33,8 +36,13 @@ public class Product implements Serializable {
 		inverseJoinColumns = @JoinColumn(name = "id_category"))
 	private Set<Category> categories;
 	
+	@OneToMany(mappedBy = "id.product", fetch = FetchType.LAZY)
+	@JsonIgnore
+	private Set<OrderItem> orderItems;
+	
 	{
 		this.categories = new HashSet<>();
+		orderItems = new HashSet<>();
 	}
 	
 	protected Product() { }
@@ -101,6 +109,23 @@ public class Product implements Serializable {
 	
 	void removeCategoryInternal(Category category) {
 		categories.remove(category);
+	}
+	
+	public Set<Order> getOrders() {
+		Set<Order> orders = this.orderItems.stream()
+			.map(OrderItem::getOrder)
+			.collect(Collectors.toSet());
+		return orders;
+	}
+		
+	void removeOrderItemInternal(OrderItem oi) {
+		Objects.requireNonNull(oi);
+		this.orderItems.remove(oi);
+	}
+		
+	void addOrderItemInternal(OrderItem oi) {
+		Objects.requireNonNull(oi);
+		this.orderItems.add(oi);
 	}
 	
 	private void validateName(String name) {

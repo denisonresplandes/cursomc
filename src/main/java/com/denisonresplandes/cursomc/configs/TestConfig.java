@@ -1,5 +1,6 @@
 package com.denisonresplandes.cursomc.configs;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -15,6 +16,7 @@ import com.denisonresplandes.cursomc.domain.Category;
 import com.denisonresplandes.cursomc.domain.City;
 import com.denisonresplandes.cursomc.domain.Customer;
 import com.denisonresplandes.cursomc.domain.Order;
+import com.denisonresplandes.cursomc.domain.OrderItem;
 import com.denisonresplandes.cursomc.domain.PaymentBankSlip;
 import com.denisonresplandes.cursomc.domain.Product;
 import com.denisonresplandes.cursomc.domain.State;
@@ -24,6 +26,7 @@ import com.denisonresplandes.cursomc.repositories.AddressRepository;
 import com.denisonresplandes.cursomc.repositories.CategoryRepository;
 import com.denisonresplandes.cursomc.repositories.CityRepository;
 import com.denisonresplandes.cursomc.repositories.CustomerRepository;
+import com.denisonresplandes.cursomc.repositories.OrderItemRepository;
 import com.denisonresplandes.cursomc.repositories.OrderRepository;
 import com.denisonresplandes.cursomc.repositories.ProductRepository;
 import com.denisonresplandes.cursomc.repositories.StateRepository;
@@ -51,6 +54,9 @@ public class TestConfig implements CommandLineRunner {
 	
 	@Autowired
 	private OrderRepository orderRepository;
+	
+	@Autowired
+	private OrderItemRepository orderItemRepository;
 	
 	@Override
 	public void run(String... args) throws Exception {
@@ -114,5 +120,15 @@ public class TestConfig implements CommandLineRunner {
 		customer1.addOrder(o2);
 		
 		orderRepository.saveAll(List.of(o1, o2));
+		
+		OrderItem oi1 = new OrderItem(o1, prod1, 0.00, 1, new BigDecimal("2000.00"));
+		OrderItem oi2 = new OrderItem(o1, prod3, 0.00, 2, new BigDecimal("80.00"));
+		OrderItem oi3 = new OrderItem(o2, prod2, 100.00, 1, new BigDecimal("800.00"));
+		
+		o1.addOrderItem(oi1);
+		o1.addOrderItem(oi2);
+		o2.addOrderItem(oi3);
+		
+		orderItemRepository.saveAll(List.of(oi1, oi2, oi3));
 	}
 }
