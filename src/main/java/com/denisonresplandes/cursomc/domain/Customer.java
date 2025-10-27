@@ -6,6 +6,7 @@ import java.util.Objects;
 import java.util.Set;
 
 import com.denisonresplandes.cursomc.domain.enums.TypeCustomer;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.CollectionTable;
@@ -39,6 +40,7 @@ public class Customer implements Serializable {
 		orphanRemoval = true)
 	private Set<Address> addresses;
 	
+	@JsonIgnore
 	@OneToMany(mappedBy = "customer", cascade = CascadeType.REMOVE,
 		orphanRemoval = true)
 	private Set<Order> orders;

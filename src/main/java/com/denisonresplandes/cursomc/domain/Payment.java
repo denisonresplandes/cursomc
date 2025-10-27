@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.Objects;
 
 import com.denisonresplandes.cursomc.domain.enums.PaymentStatus;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -26,6 +27,7 @@ public abstract class Payment implements Serializable {
 	@OneToOne
 	@JoinColumn(name = "id_order")
 	@MapsId // a PK de payment será a mesma PK de Order. Nome da PK será id_order.
+	@JsonIgnore
 	private Order order;
 	
 	protected Payment() { }

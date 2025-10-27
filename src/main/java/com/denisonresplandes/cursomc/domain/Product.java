@@ -36,8 +36,8 @@ public class Product implements Serializable {
 		inverseJoinColumns = @JoinColumn(name = "id_category"))
 	private Set<Category> categories;
 	
-	@OneToMany(mappedBy = "id.product", fetch = FetchType.LAZY)
 	@JsonIgnore
+	@OneToMany(mappedBy = "id.product", fetch = FetchType.LAZY)
 	private Set<OrderItem> orderItems;
 	
 	{
@@ -111,6 +111,7 @@ public class Product implements Serializable {
 		categories.remove(category);
 	}
 	
+	@JsonIgnore
 	public Set<Order> getOrders() {
 		Set<Order> orders = this.orderItems.stream()
 			.map(OrderItem::getOrder)

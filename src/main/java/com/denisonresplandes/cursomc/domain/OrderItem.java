@@ -3,6 +3,8 @@ package com.denisonresplandes.cursomc.domain;
 import java.math.BigDecimal;
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 
@@ -26,6 +28,7 @@ public final class OrderItem {
 		this.price = price;
 	}
 	
+	@JsonIgnore
 	public Order getOrder() {
 		return id.getOrder();
 	}

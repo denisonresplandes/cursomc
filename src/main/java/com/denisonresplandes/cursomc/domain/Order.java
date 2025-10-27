@@ -8,6 +8,8 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -57,6 +59,10 @@ public class Order implements Serializable {
 		this.customer = customer;
 		this.deliveryAddress = deliveryAddress;
 	}
+	
+	public Integer getId() {
+		return id;
+	}
 		
 	public ZonedDateTime getDate() {
 		return date;
@@ -84,6 +90,11 @@ public class Order implements Serializable {
 		this.deliveryAddress = newAddress;
 	}
 	
+	public Set<OrderItem> getItems() {
+		return orderItems;
+	}
+		
+	@JsonIgnore
 	public Set<Product> getProducts() {
 		Set<Product> products = this.orderItems.stream()
 			.map(OrderItem::getProduct)
